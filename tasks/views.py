@@ -6,6 +6,7 @@ from django.db import IntegrityError
 from .form import TaskForm
 from .models import Tasks
 from django.utils import timezone
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
@@ -35,7 +36,7 @@ def signup(request):
             'form': UserCreationForm,
             'error': "password to no match"
         })
-
+@login_required
 def tasks(request):
     task = Tasks.objects.filter(user = request.user, date_completed__isnull=True)
     return render(request, 'tasks.html',{
@@ -61,7 +62,7 @@ def signin(request):
         else:
             login(request,user)
             return redirect('tasks')
-
+@login_required
 def create_task(request):
     if request.method == 'GET':
         return render(request,'create_task.html',{
@@ -79,7 +80,7 @@ def create_task(request):
                 'form': TaskForm,
                 'error': 'Plase provide valida data'
             })
-
+@login_required
 def task_detail(request, task_id): 
     if request.method == 'GET':
         task=get_object_or_404(Tasks, pk=task_id)
@@ -101,16 +102,22 @@ def task_detail(request, task_id):
             'error': "Error updating task"
         })
 
-
+@login_required
 def complete_task(request, task_id):
     task= get_object_or_404(Tasks,pk=task_id)
     if request.method == 'POST':
         task.date_completed = timezone.now()
         task.save()
         return redirect('tasks')
-    
+@login_required
 def delete_task(request, task_id):
     task= get_object_or_404(Tasks,pk=task_id)
     if request.method == 'POST':
         task.delete()
         return redirect('tasks')
+@login_required
+def tasks_completed(request):
+    task = Tasks.objects.filter(user = request.user, date_completed__isnull=False).order_by('date_completed')
+    return render(request, 'tasks.html',{
+        'tasks': task
+    })

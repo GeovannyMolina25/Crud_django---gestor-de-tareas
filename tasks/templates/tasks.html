@@ -13,8 +13,12 @@
         <h1>{{task.title}}</h1>
         <p>{{task.description}}</p> 
         <p>{{task.user.username}}</p>
+        <p>{{task.date_completed | date:'M J Y:i'}}</p>
         </a>
 </li> 
+<h1>Task completed</h1>
+
+
 {% endfor %}
 {% endblock %}
 </ul>
